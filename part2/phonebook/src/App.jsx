@@ -15,20 +15,11 @@ const App = () => {
 		});
 	}, []);
 
-	const handleNameChange = (e) => {
-		console.log(e.target.value);
-		setNewName(e.target.value);
-	};
+	const handleNameChange = (e) => setNewName(e.target.value);
 
-	const handleNumberChange = (e) => {
-		console.log(e.target.value);
-		setNewNumber(e.target.value);
-	};
+	const handleNumberChange = (e) => setNewNumber(e.target.value);
 
-	const handleFilterChange = (e) => {
-		console.log(e.target.value);
-		setNewFilter(e.target.value);
-	};
+	const handleFilterChange = (e) => setNewFilter(e.target.value);
 
 	const handleDelete = ({ name, id }) => {
 		if (window.confirm(`Delete ${name}`)) {
@@ -44,12 +35,22 @@ const App = () => {
 			name: newName,
 			number: newNumber,
 		};
-		if (
-			persons.find((person) => JSON.stringify(person) === JSON.stringify(obj))
-		) {
-			alert(`${newName} is already added to phonebook`);
-		} else {
+
+		const index = persons.findIndex((person) => person.name === obj.name);
+
+		if (index === -1)
 			Service.create(obj).then((res) => setPersons(persons.concat(res)));
+		else {
+			if (
+				window.confirm(
+					`${newName} is already added to phonebook, replace the old number with new one?`
+				)
+			) {
+				let copy = [...persons];
+				Service.update(copy[index].id, obj);
+				copy[index].number = newNumber;
+				setPersons(copy);
+			}
 		}
 	};
 
