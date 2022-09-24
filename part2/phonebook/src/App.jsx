@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Filter from '../components/Filter';
+import Notification from '../components/Notification';
 import Person from '../components/Person';
 import PersonForm from '../components/PersonForm';
 import Service from '../services/persons.js';
@@ -9,6 +10,8 @@ const App = () => {
 	const [newName, setNewName] = useState('');
 	const [newNumber, setNewNumber] = useState('');
 	const [newFilter, setNewFilter] = useState('');
+	const [notificationMessage, setNotificationMessage] = useState(null);
+	const [notiStatus, setNotiStatus] = useState('');
 	useEffect(() => {
 		Service.getAll().then((res) => {
 			setPersons(res);
@@ -25,6 +28,11 @@ const App = () => {
 		if (window.confirm(`Delete ${name}`)) {
 			Service.remove(id);
 			setPersons(persons.filter((person) => person.id !== id));
+			setNotificationMessage(`deleted ${name}`);
+			setNotiStatus('error');
+			setTimeout(() => {
+				setNotificationMessage(null);
+			}, 5000);
 		}
 	};
 
@@ -38,9 +46,14 @@ const App = () => {
 
 		const index = persons.findIndex((person) => person.name === obj.name);
 
-		if (index === -1)
+		if (index === -1) {
 			Service.create(obj).then((res) => setPersons(persons.concat(res)));
-		else {
+			setNotificationMessage(`added ${newName}`);
+			setNotiStatus('success');
+			setTimeout(() => {
+				setNotificationMessage(null);
+			}, 5000);
+		} else {
 			if (
 				window.confirm(
 					`${newName} is already added to phonebook, replace the old number with new one?`
@@ -50,6 +63,11 @@ const App = () => {
 				Service.update(copy[index].id, obj);
 				copy[index].number = newNumber;
 				setPersons(copy);
+				setNotificationMessage(`updated ${newName}`);
+				setNotiStatus('success');
+				setTimeout(() => {
+					setNotificationMessage(null);
+				}, 5000);
 			}
 		}
 	};
@@ -59,6 +77,7 @@ const App = () => {
 			<h2>Phonebook</h2>
 			<Filter value={newFilter} onChange={handleFilterChange} />
 			<h2>add a new</h2>
+			<Notification message={notificationMessage} status={notiStatus} />
 			<PersonForm
 				addPerson={addPerson}
 				newName={newName}
