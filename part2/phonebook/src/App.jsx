@@ -30,6 +30,13 @@ const App = () => {
 		setNewFilter(e.target.value);
 	};
 
+	const handleDelete = ({ name, id }) => {
+		if (window.confirm(`Delete ${name}`)) {
+			Service.remove(id);
+			setPersons(persons.filter((person) => person.id !== id));
+		}
+	};
+
 	const addPerson = (event) => {
 		event.preventDefault();
 
@@ -63,8 +70,8 @@ const App = () => {
 				.filter((person) =>
 					person.name.toLowerCase().includes(newFilter.toLowerCase())
 				)
-				.map(({ name, number, id }) => (
-					<Person name={name} number={number} key={id} />
+				.map((person) => (
+					<Person person={person} handleDelete={handleDelete} key={person.id} />
 				))}
 		</div>
 	);

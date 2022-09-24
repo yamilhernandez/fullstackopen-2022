@@ -1,9 +1,11 @@
 import React from 'react';
+import Service from '../services/persons';
 
-const Person = ({ name, number }) => {
+const Person = ({ person, handleDelete }) => {
 	return (
 		<p>
-			{name} {number}
+			{person.name} {person.number}{' '}
+			<button onClick={() => handleDelete(person)}> delete</button>
 		</p>
 	);
 };
